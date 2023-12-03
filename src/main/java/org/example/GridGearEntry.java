@@ -5,5 +5,5 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Getter
-public class Gear extends GridEntry {
+public class GridGearEntry extends GridEntry {
 }

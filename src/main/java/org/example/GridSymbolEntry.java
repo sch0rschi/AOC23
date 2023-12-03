@@ -5,5 +5,5 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Getter
-public class Symbols extends GridEntry {
+public class GridSymbolEntry extends GridEntry {
 }

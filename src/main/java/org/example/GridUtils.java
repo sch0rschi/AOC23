@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class GridUtils {
     static List<GridEntry> mapToGridEntries(String line) {
-        Pattern pattern = Pattern.compile("\\*|\\d+|[^0-9*]+");
+        Pattern pattern = Pattern.compile("\\*|\\d+|[^\\d*]+");
         var currentColumn = new AtomicInteger();
         return Arrays.stream(line.split("\\.")).<GridEntry>mapMulti((entryChain, downstream) -> {
                     Matcher matcher = pattern.matcher(entryChain);
@@ -22,16 +22,16 @@ public class GridUtils {
                                 .build();
                         if (Character.isDigit(match.charAt(0))) {
                             int number = Integer.parseInt(match);
-                            downstream.accept(PartNumber.builder()
+                            downstream.accept(GridPartEntry.builder()
                                     .number(number)
                                     .gridCoordinates(gridCoordinates)
                                     .build());
                         } else if ("*".equals(match)) {
-                            downstream.accept(Gear.builder()
+                            downstream.accept(GridGearEntry.builder()
                                     .gridCoordinates(gridCoordinates)
                                     .build());
                         } else {
-                            downstream.accept(Symbols.builder()
+                            downstream.accept(GridSymbolEntry.builder()
                                     .gridCoordinates(gridCoordinates)
                                     .build());
                         }

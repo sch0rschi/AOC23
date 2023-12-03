@@ -5,7 +5,7 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Getter
-public class PartNumber extends GridEntry {
+public class GridPartEntry extends GridEntry {
     private GridCoordinates gridCoordinates;
     private int number;
 }
