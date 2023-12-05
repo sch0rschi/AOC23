@@ -32,11 +32,10 @@ public class Day5Part2 {
                     var range = iterator.next();
 
                     var overlapAndRemaining = RangeUtils.calculateOverlapAndRemaining(mapping.getRange(), range);
-                    var overlap = overlapAndRemaining.getLeft();
-                    if (overlap != null) {
+                    if (overlapAndRemaining != null) {
                         iterator.remove();
-                        overlap.shiftByOffset(mapping.getOffset());
-                        doneRanges.add(overlap);
+                        overlapAndRemaining.getLeft().shiftByOffset(mapping.getOffset());
+                        doneRanges.add(overlapAndRemaining.getLeft());
                         for (var remainingRange : overlapAndRemaining.getRight()) {
                             iterator.add(remainingRange);
                         }
@@ -46,8 +45,8 @@ public class Day5Part2 {
             doneRanges.addAll(unprocessedRanges);
         }
         var min = doneRanges.stream().mapToLong(Range::getStart).min().orElse(-1);
-        System.out.println(min);
         Instant end = Instant.now();
+        System.out.println(min);
         System.out.println(Duration.between(start, end));
     }
 

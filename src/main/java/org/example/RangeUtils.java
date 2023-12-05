@@ -12,15 +12,15 @@ public class RangeUtils {
         if (overlapStart <= overlapEnd) {
             var remaining = new ArrayList<Range>(2);
             var overlap = Range.builder().start(overlapStart).end(overlapEnd).build();
-            if(mapped.getStart() < overlap.getStart()) {
-                remaining.add(Range.builder().start(mapped.getStart()).end(overlap.getStart()-1).build());
+            if (mapped.getStart() < overlap.getStart()) {
+                remaining.add(Range.builder().start(mapped.getStart()).end(overlap.getStart() - 1).build());
             }
-            if(mapped.getEnd()>overlap.getEnd()) {
+            if (mapped.getEnd() > overlap.getEnd()) {
                 remaining.add(Range.builder().start(overlap.getEnd() + 1).end(mapped.getEnd()).build());
             }
             return Pair.of(overlap, remaining);
-        }else {
-            return Pair.of(null, List.of(mapped));
+        } else {
+            return null;
         }
     }
 }
