@@ -1,7 +1,5 @@
 package org.example;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,25 +22,28 @@ public class Day5Part2 {
         var unprocessedRanges = new ArrayList<Range>();
         var doneRanges = new ArrayList<>(almanac.getSeeds());
         for (var mappingLevel : AlmanacUtils.getMaps(almanac)) {
+            var tempList = unprocessedRanges;
             unprocessedRanges = doneRanges;
-            doneRanges = new ArrayList<>();
+            doneRanges = tempList;
+            doneRanges.clear();
             for (var mapping : mappingLevel) {
                 var iterator = unprocessedRanges.listIterator();
                 while (iterator.hasNext()) {
                     var range = iterator.next();
 
-                   var overlapAndRemaining = RangeUtils.calculateOverlapAndRemaining(mapping.getRange(), range);
+                    var overlapAndRemaining = RangeUtils.calculateOverlapAndRemaining(mapping.getRange(), range);
                     var overlap = overlapAndRemaining.getLeft();
                     if (overlap != null) {
                         iterator.remove();
                         overlap.shiftByOffset(mapping.getOffset());
                         doneRanges.add(overlap);
-                        for(var remainingRange : overlapAndRemaining.getRight()) {
+                        for (var remainingRange : overlapAndRemaining.getRight()) {
                             iterator.add(remainingRange);
                         }
                     }
                 }
             }
+            doneRanges.addAll(unprocessedRanges);
         }
         var min = doneRanges.stream().mapToLong(Range::getStart).min().orElse(-1);
         System.out.println(min);
