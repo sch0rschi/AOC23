@@ -14,7 +14,7 @@ public class Day4Part1 {
         var lines = Files.readAllLines(path);
         int sum = lines.stream()
                 .map(GameCardUtils::mapToGameCard)
-                .mapToInt(GameCardUtils::calculateGameCardScore)
+                .mapToInt(GameCard::getScore)
                 .sum();
 
         System.out.println(sum);

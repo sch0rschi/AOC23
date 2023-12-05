@@ -10,4 +10,6 @@ import java.util.Set;
 public class GameCard {
     private Set<Integer> winningNumbers;
     private Set<Integer> ownNumbers;
+    private int score;
+    private int matchings;
 }

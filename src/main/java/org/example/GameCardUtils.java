@@ -12,11 +12,17 @@ public class GameCardUtils {
         var ownNumbersString = split[2].trim().split(" +");
         var winningNumbers = Arrays.stream(winningNumbersString).map(Integer::parseInt).collect(Collectors.toSet());
         var ownNumbers = Arrays.stream(ownNumbersString).map(Integer::parseInt).collect(Collectors.toSet());
-        return GameCard.builder().winningNumbers(winningNumbers).ownNumbers(ownNumbers).build();
+        var intersection = SetUtils.intersection(winningNumbers, ownNumbers);
+        int matchings = intersection.size();
+        return GameCard.builder()
+                .winningNumbers(winningNumbers)
+                .ownNumbers(ownNumbers)
+                .score(calculateGameCardScore(matchings))
+                .matchings(matchings)
+                .build();
     }
 
-    public static int calculateGameCardScore(GameCard gameCard) {
-        var intersection = SetUtils.intersection(gameCard.getWinningNumbers(), gameCard.getOwnNumbers());
-        return intersection.isEmpty() ? 0 : 1 << (intersection.size() - 1);
+    public static int calculateGameCardScore(int matchings) {
+        return matchings * (1 << (matchings - 1));
     }
 }
