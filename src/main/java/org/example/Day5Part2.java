@@ -13,7 +13,6 @@ import java.util.*;
 public class Day5Part2 {
     public static void main(String[] args) throws IOException {
 
-        Instant start = Instant.now();
         Path path = Paths.get("src/main/resources/day5");
         var lines = String.join("\n", Files.readAllLines(path));
         String[] split = lines.split("\n\n");
@@ -21,28 +20,29 @@ public class Day5Part2 {
         Almanac almanac = AlmanacUtils.parseAlmanac(split);
         fixSeedRanges(almanac);
 
-        var unprocessedRanges = new LinkedList<Range>();
-        var doneRanges = new LinkedList<>(almanac.getSeeds());
+        Instant start = Instant.now();
+        var unprocessedRanges = new ArrayList<Range>();
+        var doneRanges = new ArrayList<>(almanac.getSeeds());
         for (var mappingLevel : AlmanacUtils.getMaps(almanac)) {
             unprocessedRanges = doneRanges;
-            doneRanges = new LinkedList<>();
+            doneRanges = new ArrayList<>();
             for (var mapping : mappingLevel) {
-                ListIterator<Range> iterator = unprocessedRanges.listIterator();
+                var iterator = unprocessedRanges.listIterator();
                 while (iterator.hasNext()) {
                     var range = iterator.next();
-                    iterator.remove();
-                    Pair<Optional<Range>, List<Range>> overlapAndRemaining = RangeUtils.calculateOverlapAndRemaining(mapping.getRange(), range);
-                    Optional<Range> overlapOptional = overlapAndRemaining.getLeft();
-                    if (overlapOptional.isPresent()) {
-                        overlapOptional.get().shiftByOffset(mapping.getOffset());
-                        doneRanges.add(overlapOptional.get());
-                    }
-                    for(var remainingRange : overlapAndRemaining.getRight()) {
-                        iterator.add(remainingRange);
+
+                   var overlapAndRemaining = RangeUtils.calculateOverlapAndRemaining(mapping.getRange(), range);
+                    var overlap = overlapAndRemaining.getLeft();
+                    if (overlap != null) {
+                        iterator.remove();
+                        overlap.shiftByOffset(mapping.getOffset());
+                        doneRanges.add(overlap);
+                        for(var remainingRange : overlapAndRemaining.getRight()) {
+                            iterator.add(remainingRange);
+                        }
                     }
                 }
             }
-            doneRanges.addAll(unprocessedRanges);
         }
         var min = doneRanges.stream().mapToLong(Range::getStart).min().orElse(-1);
         System.out.println(min);
