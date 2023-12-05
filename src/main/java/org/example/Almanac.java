@@ -2,19 +2,27 @@ package org.example;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.Triple;
+import lombok.Setter;
 
 import java.util.List;
 
 @Builder
 @Getter
 public class Almanac {
-    private List<Long> seeds;
-    private List<Triple<Long, Long, Long>> seedToSoil;
-    private List<Triple<Long, Long, Long>> soilToFertilizer;
-    private List<Triple<Long, Long, Long>> fertilizerToWater;
-    private List<Triple<Long, Long, Long>> waterToLight;
-    private List<Triple<Long, Long, Long>> lightToTemperature;
-    private List<Triple<Long, Long, Long>> temperatureToHumidity;
-    private List<Triple<Long, Long, Long>> humidityToLocation;
+    @Setter
+    private List<Range> seeds;
+    private List<RangeMapping> seedToSoil;
+    private List<RangeMapping> soilToFertilizer;
+    private List<RangeMapping> fertilizerToWater;
+    private List<RangeMapping> waterToLight;
+    private List<RangeMapping> lightToTemperature;
+    private List<RangeMapping> temperatureToHumidity;
+    private List<RangeMapping> humidityToLocation;
+
+    @Builder
+    @Getter
+    static class RangeMapping {
+        private Range range;
+        private long offset;
+    }
 }
