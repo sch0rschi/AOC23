@@ -3,6 +3,7 @@ package org.example;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -18,7 +19,7 @@ public class AlmanacUtils {
         var mapBuilderSetters = getAlmanacMapBuilderSetters(builder);
         for (var mapIndex = 0; mapIndex < mapBuilderSetters.size(); mapIndex++) {
             var text = split[mapIndex + 1];
-            List<Almanac.RangeMapping> map = getMap(text);
+            var map = getMap(text);
             var setter = mapBuilderSetters.get(mapIndex);
             setter.accept(map);
         }
@@ -34,17 +35,17 @@ public class AlmanacUtils {
         return value;
     }
 
-    private static long getMappedValue(List<Almanac.RangeMapping> map, long value) {
-        return map.stream()
-                .filter(mapEntry -> mapEntry.getRange().getStart() <= value && mapEntry.getRange().getEnd() >= value)
+    private static long getMappedValue(Almanac.RangeMapping[] mappings, long value) {
+        return Arrays.stream(mappings)
+                .filter(mapEntry -> mapEntry.getStart() <= value && mapEntry.getEnd() >= value)
                 .findAny()
                 .map(mapEntry -> mapEntry.getOffset() + value)
                 .orElse(value);
     }
 
-    private static List<Almanac.RangeMapping> getMap(String text) {
+    private static Almanac.RangeMapping[] getMap(String text) {
         var mappings = Arrays.stream(text.trim().split("(^.+:\n|\n)")).filter(StringUtils::isNotBlank).toList();
-        return mappings.stream().map(AlmanacUtils::toMapEntry).toList();
+        return mappings.stream().map(AlmanacUtils::toMapEntry).sorted(Comparator.comparingLong(Almanac.RangeMapping::getStart)).toArray(Almanac.RangeMapping[]::new);
     }
 
     private static Almanac.RangeMapping toMapEntry(String entryString) {
@@ -52,7 +53,8 @@ public class AlmanacUtils {
         Matcher matcher = pattern.matcher(entryString);
         var numbers = (long[])matcher.results().mapToLong(result -> Long.parseLong(result.group())).toArray();
         return Almanac.RangeMapping.builder()
-                .range(Range.builder().start(numbers[1]).end(numbers[1] + numbers[2] - 1).build())
+                .start(numbers[1])
+                .end(numbers[1] + numbers[2] - 1)
                 .offset(numbers[0] - numbers[1])
                 .build();
     }
@@ -61,10 +63,10 @@ public class AlmanacUtils {
         Pattern pattern = Pattern.compile("\\d+");
         Matcher matcher = pattern.matcher(seedString);
         return matcher.results().map(result -> Long.parseLong(result.group()))
-                .map(seed -> Range.builder().start(seed).build()).toList();
+                .map(seed -> new Range(seed, 0)).toList();
     }
 
-    static List<List<Almanac.RangeMapping>> getMaps(Almanac almanac) {
+    static List<Almanac.RangeMapping[]> getMaps(Almanac almanac) {
         return List.of(almanac.getSeedToSoil(),
                 almanac.getSoilToFertilizer(),
                 almanac.getFertilizerToWater(),
@@ -74,7 +76,7 @@ public class AlmanacUtils {
                 almanac.getHumidityToLocation());
     }
 
-    static List<Consumer<List<Almanac.RangeMapping>>> getAlmanacMapBuilderSetters(Almanac.AlmanacBuilder almanacBuilder) {
+    static List<Consumer<Almanac.RangeMapping[]>> getAlmanacMapBuilderSetters(Almanac.AlmanacBuilder almanacBuilder) {
         return List.of(almanacBuilder::seedToSoil,
                 almanacBuilder::soilToFertilizer,
                 almanacBuilder::fertilizerToWater,

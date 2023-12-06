@@ -11,18 +11,19 @@ import java.util.List;
 public class Almanac {
     @Setter
     private List<Range> seeds;
-    private List<RangeMapping> seedToSoil;
-    private List<RangeMapping> soilToFertilizer;
-    private List<RangeMapping> fertilizerToWater;
-    private List<RangeMapping> waterToLight;
-    private List<RangeMapping> lightToTemperature;
-    private List<RangeMapping> temperatureToHumidity;
-    private List<RangeMapping> humidityToLocation;
+    private RangeMapping[] seedToSoil;
+    private RangeMapping[] soilToFertilizer;
+    private RangeMapping[] fertilizerToWater;
+    private RangeMapping[] waterToLight;
+    private RangeMapping[] lightToTemperature;
+    private RangeMapping[] temperatureToHumidity;
+    private RangeMapping[] humidityToLocation;
 
     @Builder
     @Getter
     static class RangeMapping {
-        private Range range;
+        private long start;
+        private long end;
         private long offset;
     }
 }

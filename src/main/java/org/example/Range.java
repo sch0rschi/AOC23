@@ -1,9 +1,9 @@
 package org.example;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Builder
+@AllArgsConstructor
 @Getter
 class Range {
     private long start;

@@ -6,21 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RangeUtils {
-    static Pair<Range, List<Range>> calculateOverlapAndRemaining(Range mapping, Range mapped) {
+    static Pair<Range, List<Range>> calculateOverlapAndRemaining(Almanac.RangeMapping mapping, Range mapped) {
         var overlapStart = Math.max(mapping.getStart(), mapped.getStart());
         var overlapEnd = Math.min(mapping.getEnd(), mapped.getEnd());
         if (overlapStart <= overlapEnd) {
             var remaining = new ArrayList<Range>(2);
-            var overlap = Range.builder().start(overlapStart).end(overlapEnd).build();
+            var overlap = new Range(overlapStart, overlapEnd);
             if (mapped.getStart() < overlap.getStart()) {
-                remaining.add(Range.builder().start(mapped.getStart()).end(overlap.getStart() - 1).build());
+                remaining.add(new Range(mapped.getStart(),overlap.getStart() - 1));
             }
             if (mapped.getEnd() > overlap.getEnd()) {
-                remaining.add(Range.builder().start(overlap.getEnd() + 1).end(mapped.getEnd()).build());
+                remaining.add(new Range(overlap.getEnd() + 1, mapped.getEnd()));
             }
             return Pair.of(overlap, remaining);
-        } else {
-            return null;
         }
+        return null;
     }
 }
