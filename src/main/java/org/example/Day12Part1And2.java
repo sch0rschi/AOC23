@@ -9,6 +9,8 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,8 +25,10 @@ public class Day12Part1And2 {
 
         BigInteger sum = lines.stream().map(Day12Part1And2::parseInput).map(Day12Part1And2::calculatePossibleStatesCount).reduce(BigInteger.ZERO, BigInteger::add);
         System.out.println(sum);
-        sum = lines.stream().map(Day12Part1And2::modifyInput).map(Day12Part1And2::parseInput).map(Day12Part1And2::calculatePossibleStatesCount).reduce(BigInteger.ZERO, BigInteger::add);
-        System.out.println(sum);
+        Instant start = Instant.now();
+        sum = lines.stream().unordered().parallel().map(Day12Part1And2::modifyInput).map(Day12Part1And2::parseInput).map(Day12Part1And2::calculatePossibleStatesCount).reduce(BigInteger.ZERO, BigInteger::add);
+        Instant end = Instant.now();
+        System.out.println(sum + " took: " + Duration.between(start, end));
     }
 
     private static String modifyInput(String s) {
@@ -36,10 +40,10 @@ public class Day12Part1And2 {
 
     private static BigInteger calculatePossibleStatesCount(SpringState springState) {
         BigInteger[][] cache = new BigInteger[springState.getStates().length][springState.getChecks().length];
-        return calculatePossibleStatesCount(springState.getStates().length - 2, springState.getStates(), springState.getChecks().length - 1, springState.getChecks(), cache);
+        return calculatePossibleStatesCount(springState.getStates().length - 2, springState.getStates(), springState.getChecks().length - 1, springState.getChecks(), cache, springState.getSpringCheckSums(), springState.getSpringStatesSums());
     }
 
-    private static BigInteger calculatePossibleStatesCount(int maxStateIndex, State[] states, int currentBlockIndex, int[] springBlocks, BigInteger[][] cache) {
+    private static BigInteger calculatePossibleStatesCount(int maxStateIndex, State[] states, int currentBlockIndex, int[] springBlocks, BigInteger[][] cache, int[] checkSums, int[] stateSums) {
 
         if (currentBlockIndex == -1) {
             if(IntStream.range(0, maxStateIndex + 2).noneMatch(i -> states[i] == SPRING)) {
@@ -57,15 +61,28 @@ public class Day12Part1And2 {
             return cachedValue;
         }
 
+        if(stateSums[maxStateIndex] > checkSums[currentBlockIndex]) {
+            return BigInteger.ZERO;
+        }
+
         int springBlockLength = springBlocks[currentBlockIndex];
         BigInteger sum = BigInteger.ZERO;
         for (int blockEndIndex = maxStateIndex; blockEndIndex - springBlockLength + 1 >= 0 && states[blockEndIndex + 1] != SPRING; blockEndIndex--) {
-            if (IntStream.range(blockEndIndex - springBlockLength + 1, blockEndIndex + 1).noneMatch(i -> states[i] == NO_SPRING)) {
-                sum = sum.add(calculatePossibleStatesCount(blockEndIndex - springBlockLength - 1, states, currentBlockIndex - 1, springBlocks, cache));
+            if (fits(states, blockEndIndex, springBlockLength)) {
+                sum = sum.add(calculatePossibleStatesCount(blockEndIndex - springBlockLength - 1, states, currentBlockIndex - 1, springBlocks, cache, checkSums, stateSums));
             }
         }
         cache[maxStateIndex][currentBlockIndex] = sum;
         return sum;
+    }
+
+    private static boolean fits(State[] states, int blockEndIndex, int springBlockLength) {
+        for(int i = blockEndIndex - springBlockLength + 1; i < blockEndIndex + 1; i++) {
+            if(states[i] == NO_SPRING) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static SpringState parseInput(String s) {
@@ -77,7 +94,27 @@ public class Day12Part1And2 {
             case '?' -> UNKNOWN;
             default -> throw new NotImplementedException();
         }).toArray(State[]::new);
-        return SpringState.builder().states(states).checks(checks).build();
+
+        int[] checkSums = new int[checks.length];
+        int sum = 0;
+        for(int i = 0; i < checks.length; i++) {
+            sum += checks[i];
+            checkSums[i] = sum;
+        }
+
+        int[] stateSums = new int[states.length];
+        sum = 0;
+        for(int i = 0; i < states.length; i++) {
+            sum += states[i] == SPRING ? 1 : 0;
+            stateSums[i] = sum;
+        }
+
+        return SpringState.builder()
+                .states(states)
+                .checks(checks)
+                .springCheckSums(checkSums)
+                .springStatesSums(stateSums)
+                .build();
     }
 
     @Builder
@@ -85,6 +122,9 @@ public class Day12Part1And2 {
     private static class SpringState {
         State[] states;
         int[] checks;
+        int[] springCheckSums;
+        int[] springStatesSums;
+
     }
 
     enum State {
