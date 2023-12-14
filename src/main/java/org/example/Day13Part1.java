@@ -25,21 +25,9 @@ public class Day13Part1 {
             }
         }
 
-        long sum = patterns.stream().map(Day13Part1::mapToArrays).mapToLong(Day13Part1::calculateScore).peek(System.out::println).sum();
+        long sum = patterns.stream().map(MatrixUtils::mapToArrays).mapToLong(Day13Part1::calculateScore).peek(System.out::println).sum();
         System.out.println(sum);
 
-    }
-
-    private static Boolean[][] mapToArrays(List<List<Boolean>> lists) {
-        int height = lists.size();
-        int width = lists.get(0).size();
-        Boolean[][] booleans = new Boolean[height][width];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                booleans[y][x] = lists.get(y).get(x);
-            }
-        }
-        return booleans;
     }
 
     private static long calculateScore(Boolean[][] pattern) {
@@ -50,7 +38,7 @@ public class Day13Part1 {
             remainingVerticalSymmetries.removeIf(symmetryColumn -> isNotSymmetryRowSymmetry(symmetryColumn, row));
         }
 
-        Boolean[][] transposed = transpose(pattern);
+        Boolean[][] transposed = MatrixUtils.transpose(pattern);
         HashSet<Integer> remainingHorizontalSymmetries = IntStream.range(0, height - 1).boxed().collect(Collectors.toCollection(HashSet<Integer>::new));
         for (var row : transposed) {
             remainingHorizontalSymmetries.removeIf(symmetryColumn -> isNotSymmetryRowSymmetry(symmetryColumn, row));
@@ -68,20 +56,5 @@ public class Day13Part1 {
             }
         }
         return false;
-    }
-
-    private static Boolean[][] transpose(Boolean[][] array) {
-        int rows = array.length;
-        int cols = array[0].length;
-
-        Boolean[][] transposedArray = new Boolean[cols][rows];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                transposedArray[j][i] = array[i][j];
-            }
-        }
-
-        return transposedArray;
     }
 }
