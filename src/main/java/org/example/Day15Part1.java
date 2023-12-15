@@ -13,18 +13,9 @@ public class Day15Part1 {
     @SneakyThrows
     public static void main(String... args) {
         Path path = Paths.get("src/main/resources/day15");
-        var lines = Files.readString(path).strip();
-        String[] instructions = lines.split(",");
-        int sum = Arrays.stream(instructions).mapToInt(Day15Part1::hash).peek(System.out::println).sum();
+        var line = Files.readString(path).strip();
+        String[] instructions = line.split(",");
+        int sum = Arrays.stream(instructions).mapToInt(HashUtils::hash).peek(System.out::println).sum();
         System.out.println(sum);
-    }
-
-    private static int hash(String s) {
-        return s.chars().reduce(0, (accu, add) -> {
-            accu += add;
-            accu *= 17;
-            accu %= 256;
-            return accu;
-        });
     }
 }
