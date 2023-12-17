@@ -139,24 +139,4 @@ public class Day16Part2 {
         }
     }
 
-    @Value
-    @EqualsAndHashCode
-    static class Coordinate implements Comparable<Coordinate> {
-
-        int row;
-        int column;
-
-        @Override
-        public int compareTo(Coordinate that) {
-            if (this.row != that.row) {
-                return (this.row < that.row ? -1 : 1);
-            }
-
-            if (this.column != that.column) {
-                return (this.column < that.column ? -1 : 1);
-            }
-
-            return 0;
-        }
-    }
 }
