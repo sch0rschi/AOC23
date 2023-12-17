@@ -4,29 +4,21 @@ import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.Value;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
+
+import static org.example.Constants.*;
+import static org.example.ParseUtils.parseFileToDigitMatrix;
 
 public class Day17Part1 {
 
-    public static final char LEFT = 'l';
-    public static final char UP = 'u';
-    public static final char RIGHT = 'r';
-    public static final char DOWN = 'd';
-    public static final char START = 's';
-
     @SneakyThrows
     public static void main(String... args) {
-        Path path = Paths.get("src/main/resources/day17");
-        var lines = Files.readAllLines(path);
-        int[][] heatLosses = lines.stream().map(Day17Part1::mapDigitsToIntegers).toArray(int[][]::new);
+        int[][] heatLosses = parseFileToDigitMatrix("src/main/resources/day17");
 
         PriorityQueue<SearchNode> openList = new PriorityQueue<>();
         Set<SearchNode> closedList = new HashSet<>();
 
-        openList.add(new SearchNode(new Coordinate(0, 0), START, 0));
+        openList.add(new SearchNode(new Coordinate(0, 0), N, 0));
 
         int minHeatLoss = -1;
         var destination = new Coordinate(heatLosses.length - 1, heatLosses[heatLosses.length - 1].length - 1);
@@ -58,17 +50,17 @@ public class Day17Part1 {
         Collection<SearchNode> extensions = new ArrayList<>();
 
         switch (toExtend.direction) {
-            case UP:
-            case DOWN: {
+            case U:
+            case D: {
                 addLeftRightExtensions(toExtend.getLowerBoundHeatLoss(), heatLosses, startColumn, startRow, extensions);
                 break;
             }
-            case RIGHT:
-            case LEFT: {
+            case R:
+            case L: {
                 addUpDownExtensions(toExtend.getLowerBoundHeatLoss(), heatLosses, startRow, startColumn, extensions);
                 break;
             }
-            case START: {
+            case N: {
                 addLeftRightExtensions(toExtend.getLowerBoundHeatLoss(), heatLosses, startColumn, startRow, extensions);
                 addUpDownExtensions(toExtend.getLowerBoundHeatLoss(), heatLosses, startRow, startColumn, extensions);
                 break;
@@ -85,13 +77,13 @@ public class Day17Part1 {
         for (int column = startColumn + 1; column < Math.min(heatLosses[startRow].length, startColumn + 4); column++) {
             Coordinate newCoordinate = new Coordinate(startRow, column);
             accumulatedHeatLoss += heatLosses[startRow][column];
-            extensions.add(new SearchNode(newCoordinate, RIGHT, accumulatedHeatLoss));
+            extensions.add(new SearchNode(newCoordinate, R, accumulatedHeatLoss));
         }
         accumulatedHeatLoss = startHeatLoss;
         for (int column = startColumn - 1; column > Math.max(-1, startColumn - 4); column--) {
             Coordinate newCoordinate = new Coordinate(startRow, column);
             accumulatedHeatLoss += heatLosses[startRow][column];
-            extensions.add(new SearchNode(newCoordinate, LEFT, accumulatedHeatLoss));
+            extensions.add(new SearchNode(newCoordinate, L, accumulatedHeatLoss));
         }
     }
 
@@ -100,13 +92,13 @@ public class Day17Part1 {
         for (int row = startRow + 1; row < Math.min(heatLosses.length, startRow + 4); row++) {
             Coordinate newCoordinate = new Coordinate(row, startColumn);
             accumulatedHeatLoss += heatLosses[row][startColumn];
-            extensions.add(new SearchNode(newCoordinate, DOWN, accumulatedHeatLoss));
+            extensions.add(new SearchNode(newCoordinate, D, accumulatedHeatLoss));
         }
         accumulatedHeatLoss = startHeatLoss;
         for (int row = startRow - 1; row > Math.max(-1, startRow - 4); row--) {
             Coordinate newCoordinate = new Coordinate(row, startColumn);
             accumulatedHeatLoss += heatLosses[row][startColumn];
-            extensions.add(new SearchNode(newCoordinate, UP, accumulatedHeatLoss));
+            extensions.add(new SearchNode(newCoordinate, U, accumulatedHeatLoss));
         }
     }
 

@@ -2,24 +2,15 @@ package org.example;
 
 import lombok.*;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.IntStream;
+
+import static org.example.Constants.*;
 
 public class Day16Part1 {
 
-    public static final String LEFT = "left";
-    public static final String UP = "up";
-    public static final String RIGHT = "right";
-    public static final String DOWN = "down";
-
     @SneakyThrows
     public static void main(String... args) {
-        Path path = Paths.get("src/main/resources/day16");
-        var lines = Files.readAllLines(path);
-        int[][] contraption = lines.stream().map(String::chars).map(IntStream::toArray).toArray(int[][]::new);
+        int[][] contraption = ParseUtils.parseFileToCharMatrix("src/main/resources/day16");
 
         var map = mapContraptionToMap(contraption);
 
@@ -89,37 +80,22 @@ public class Day16Part1 {
                 }
             }
         }
-        map.values().forEach(list -> list.removeIf(to -> to.coordinate().row() < 0
-                || to.coordinate().row() >= contraption.length
-                || to.coordinate().column() < 0
-                || to.coordinate().column() >= contraption[to.coordinate().row()].length));
+        map.values().forEach(list -> list.removeIf(to -> to.coordinate().getRow() < 0
+                || to.coordinate().getRow() >= contraption.length
+                || to.coordinate().getColumn() < 0
+                || to.coordinate().getColumn() >= contraption[to.coordinate().getRow()].length));
         return map;
     }
 
     record Node(String direction, Coordinate coordinate) implements Comparable<Node> {
-            @Override
-            public int compareTo(Node that) {
-                int directionComparison = this.direction.compareTo(that.direction);
-                if (directionComparison != 0) {
-                    return directionComparison < 0 ? -1 : 1;
-                }
-
-                return this.coordinate.compareTo(that.coordinate);
+        @Override
+        public int compareTo(Node that) {
+            int directionComparison = this.direction.compareTo(that.direction);
+            if (directionComparison != 0) {
+                return directionComparison < 0 ? -1 : 1;
             }
+
+            return this.coordinate.compareTo(that.coordinate);
         }
-
-    record Coordinate(int row, int column) implements Comparable<Coordinate> {
-            @Override
-            public int compareTo(Coordinate that) {
-                if (this.row != that.row) {
-                    return (this.row < that.row ? -1 : 1);
-                }
-
-                if (this.column != that.column) {
-                    return (this.column < that.column ? -1 : 1);
-                }
-
-                return 0;
-            }
-        }
+    }
 }

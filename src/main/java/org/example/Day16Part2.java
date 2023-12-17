@@ -4,26 +4,18 @@ import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.Value;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.IntStream;
+
+import static org.example.Constants.*;
 
 public class Day16Part2 {
 
-    public static final char LEFT = 'l';
-    public static final char UP = 'u';
-    public static final char RIGHT = 'r';
-    public static final char DOWN = 'd';
-
     @SneakyThrows
     public static void main(String... args) {
-        Path path = Paths.get("src/main/resources/day16");
-        var lines = Files.readAllLines(path);
-        int[][] contraption = lines.stream().map(String::chars).map(IntStream::toArray).toArray(int[][]::new);
+
+        int[][] contraption = ParseUtils.parseFileToCharMatrix("src/main/resources/day16");
 
         Instant start = Instant.now();
 
@@ -40,12 +32,12 @@ public class Day16Part2 {
     private static List<Node> getStartNodes(int[][] contraption) {
         List<Node> startNodes = new ArrayList<>();
         for (int row = 0; row < contraption.length; row++) {
-            startNodes.add(new Node(RIGHT, new Coordinate(row, 0)));
-            startNodes.add(new Node(LEFT, new Coordinate(row, contraption[row].length - 1)));
+            startNodes.add(new Node(R, new Coordinate(row, 0)));
+            startNodes.add(new Node(L, new Coordinate(row, contraption[row].length - 1)));
         }
         for (int column = 0; column < contraption[0].length; column++) {
-            startNodes.add(new Node(DOWN, new Coordinate(0, column)));
-            startNodes.add(new Node(LEFT, new Coordinate(contraption.length - 1, column)));
+            startNodes.add(new Node(D, new Coordinate(0, column)));
+            startNodes.add(new Node(L, new Coordinate(contraption.length - 1, column)));
         }
         return startNodes;
     }
@@ -71,47 +63,47 @@ public class Day16Part2 {
         Map<Node, List<Node>> map = new HashMap<>();
         for (int row = 0; row < contraption.length; row++) {
             for (int column = 0; column < contraption[row].length; column++) {
-                Node left = new Node(LEFT, new Coordinate(row, column - 1));
-                Node up = new Node(UP, new Coordinate(row - 1, column));
-                Node right = new Node(RIGHT, new Coordinate(row, column + 1));
-                Node down = new Node(DOWN, new Coordinate(row + 1, column));
+                Node left = new Node(L, new Coordinate(row, column - 1));
+                Node up = new Node(U, new Coordinate(row - 1, column));
+                Node right = new Node(R, new Coordinate(row, column + 1));
+                Node down = new Node(D, new Coordinate(row + 1, column));
                 switch (contraption[row][column]) {
 
                     case '.': {
-                        map.put(new Node(LEFT, new Coordinate(row, column)), new ArrayList<>(List.of(left)));
-                        map.put(new Node(UP, new Coordinate(row, column)), new ArrayList<>(List.of(up)));
-                        map.put(new Node(RIGHT, new Coordinate(row, column)), new ArrayList<>(List.of(right)));
-                        map.put(new Node(DOWN, new Coordinate(row, column)), new ArrayList<>(List.of(down)));
+                        map.put(new Node(L, new Coordinate(row, column)), new ArrayList<>(List.of(left)));
+                        map.put(new Node(U, new Coordinate(row, column)), new ArrayList<>(List.of(up)));
+                        map.put(new Node(R, new Coordinate(row, column)), new ArrayList<>(List.of(right)));
+                        map.put(new Node(D, new Coordinate(row, column)), new ArrayList<>(List.of(down)));
                         break;
                     }
                     case '/': {
-                        map.put(new Node(LEFT, new Coordinate(row, column)), new ArrayList<>(List.of(down)));
-                        map.put(new Node(UP, new Coordinate(row, column)), new ArrayList<>(List.of(right)));
-                        map.put(new Node(RIGHT, new Coordinate(row, column)), new ArrayList<>(List.of(up)));
-                        map.put(new Node(DOWN, new Coordinate(row, column)), new ArrayList<>(List.of(left)));
+                        map.put(new Node(L, new Coordinate(row, column)), new ArrayList<>(List.of(down)));
+                        map.put(new Node(U, new Coordinate(row, column)), new ArrayList<>(List.of(right)));
+                        map.put(new Node(R, new Coordinate(row, column)), new ArrayList<>(List.of(up)));
+                        map.put(new Node(D, new Coordinate(row, column)), new ArrayList<>(List.of(left)));
                         break;
                     }
                     case '\\': {
-                        map.put(new Node(LEFT, new Coordinate(row, column)), new ArrayList<>(List.of(up)));
-                        map.put(new Node(UP, new Coordinate(row, column)), new ArrayList<>(List.of(left)));
-                        map.put(new Node(RIGHT, new Coordinate(row, column)), new ArrayList<>(List.of(down)));
-                        map.put(new Node(DOWN, new Coordinate(row, column)), new ArrayList<>(List.of(right)));
+                        map.put(new Node(L, new Coordinate(row, column)), new ArrayList<>(List.of(up)));
+                        map.put(new Node(U, new Coordinate(row, column)), new ArrayList<>(List.of(left)));
+                        map.put(new Node(R, new Coordinate(row, column)), new ArrayList<>(List.of(down)));
+                        map.put(new Node(D, new Coordinate(row, column)), new ArrayList<>(List.of(right)));
                         break;
                     }
                     case '|': {
                         var split = new ArrayList<>(List.of(down, up));
-                        map.put(new Node(LEFT, new Coordinate(row, column)), split);
-                        map.put(new Node(UP, new Coordinate(row, column)), new ArrayList<>(List.of(up)));
-                        map.put(new Node(RIGHT, new Coordinate(row, column)), split);
-                        map.put(new Node(DOWN, new Coordinate(row, column)), new ArrayList<>(List.of(down)));
+                        map.put(new Node(L, new Coordinate(row, column)), split);
+                        map.put(new Node(U, new Coordinate(row, column)), new ArrayList<>(List.of(up)));
+                        map.put(new Node(R, new Coordinate(row, column)), split);
+                        map.put(new Node(D, new Coordinate(row, column)), new ArrayList<>(List.of(down)));
                         break;
                     }
                     case '-': {
                         var split = new ArrayList<>(List.of(right, left));
-                        map.put(new Node(LEFT, new Coordinate(row, column)), new ArrayList<>(List.of(left)));
-                        map.put(new Node(UP, new Coordinate(row, column)), split);
-                        map.put(new Node(RIGHT, new Coordinate(row, column)), new ArrayList<>(List.of(right)));
-                        map.put(new Node(DOWN, new Coordinate(row, column)), split);
+                        map.put(new Node(L, new Coordinate(row, column)), new ArrayList<>(List.of(left)));
+                        map.put(new Node(U, new Coordinate(row, column)), split);
+                        map.put(new Node(R, new Coordinate(row, column)), new ArrayList<>(List.of(right)));
+                        map.put(new Node(D, new Coordinate(row, column)), split);
                     }
                 }
             }
