@@ -1,10 +1,12 @@
 package org.example;
 
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Value;
 
 @Value
 @EqualsAndHashCode
+@ToString
 class Coordinate implements Comparable<Coordinate> {
 
     int row;

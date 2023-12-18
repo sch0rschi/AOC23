@@ -1,15 +1,21 @@
 package org.example;
 
+import java.util.Set;
+
 public class Constants {
 
-    public static final String LEFT = "left";
-    public static final String UP = "up";
-    public static final String RIGHT = "right";
-    public static final String DOWN = "down";
+    static final String LEFT = "left";
+    static final String UP = "up";
+    static final String RIGHT = "right";
+    static final String DOWN = "down";
 
-    public static final char L = 'l';
-    public static final char U = 'u';
-    public static final char R = 'r';
-    public static final char D = 'd';
-    public static final char N = 'n';
+    static final char L = 'l';
+    static final char U = 'u';
+    static final char R = 'r';
+    static final char D = 'd';
+    static final char N = 'n';
+
+    static final Set<Character> HORIZONTAL_DIRECTIONS = Set.of(L, R);
+    static final Set<Character> VERTICAL_DIRECTIONS = Set.of(U, D);
+
 }
