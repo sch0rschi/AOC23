@@ -33,7 +33,7 @@ public class Day5Part2 {
                 var range = iterator.next();
                 for (var mapping : mappingLevel) {
 
-                    var overlapAndRemaining = RangeUtils.calculateOverlapAndRemaining(mapping, range);
+                    var overlapAndRemaining = RangeUtils.calculateOverlapAndRemainingsAndShift(mapping, range);
                     if (overlapAndRemaining != null) {
                         iterator.remove();
                         overlapAndRemaining.getLeft().shiftByOffset(mapping.getOffset());
