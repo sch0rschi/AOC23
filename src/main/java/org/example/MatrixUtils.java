@@ -115,10 +115,20 @@ public class MatrixUtils {
         }
     }
 
-    private static <T>void printPattern(T[][] columns) {
+    static <T>void printPattern(T[][] columns) {
         for (T[] rows : columns) {
             for (T element : rows) {
                 System.out.print(element + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    static void printPattern(int[][] columns) {
+        for (var rows : columns) {
+            for (var element : rows) {
+                System.out.print((char)element + " ");
             }
             System.out.println();
         }
